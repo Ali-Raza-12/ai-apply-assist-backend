@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo-container
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: jobassistance
+      MONGO_INITDB_ROOT_PASSWORD: 1122
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build: .
+    container_name: backend-container
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://jobassistance:1122@mongo:27017
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

@@ -76,7 +76,7 @@ export const loginUser = async (req, res) => {
   });
 
 
-  res.json({
+  res.status(200).json({
     message: "Login successful",
     accessToken,
     user: { id: user._id, name: user.name, email: user.email },
@@ -101,7 +101,7 @@ export const logoutUser = async (req, res) => {
     secure: process.env.NODE_ENV === "production",  
     sameSite: "strict",
   });
-  res.json({ message: "Logout successful" });
+  res.status(200).json({ message: "Logout successful" });
 }
 
 export const refreshAccessToken = async (req, res) => {
@@ -118,7 +118,7 @@ export const refreshAccessToken = async (req, res) => {
     const newAccessToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
       expiresIn: "10m",
     }); 
-    res.status(200).json({ accessToken: newAccessToken });
+    res.status(200).json({ accessToken: newAccessToken, user: { id: user._id, name: user.name, email: user.email, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText } });
   } catch (error) {
     return res.status(401).json({ message: "Invalid refresh token" });
   } 

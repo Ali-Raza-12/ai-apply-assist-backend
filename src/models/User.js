@@ -27,6 +27,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    cvUrl: {
+      type: String,
+      default: "",
+    },
+    cvText: {
+      type: String,
+      default: "",
+    },
     password: {
       type: String,
       required: true,
@@ -34,6 +42,14 @@ const userSchema = new mongoose.Schema(
     refreshToken: {
       type: String,
       default: null,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+    updatedAt: {
+      type: Date,
+      default: Date.now,
     },
   },
   { timestamps: true },

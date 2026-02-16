@@ -19,10 +19,21 @@ export const updateUserProfile = async (req, res) => {
       .status(200)
       .json({
         message: "Profile updated successfully",
-        user,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          github: user.github,
+          linkedin: user.linkedin,
+          portfolio: user.portfolio,
+          cvUrl: user.cvUrl,
+          cvText: user.cvText,
+        },
       });
   } catch (error) {
     console.error("Error updating profile:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+

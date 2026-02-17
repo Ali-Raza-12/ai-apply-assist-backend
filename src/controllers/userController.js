@@ -2,6 +2,7 @@ import User from "../models/User.js";
 
 export const updateUserProfile = async (req, res) => {
   const userId = req.userId;
+  console.log("Updating profile for user ID:", userId);
   const { name, github, linkedin, portfolio, cvUrl, cvText } = req.body;
   try {
     const user = await User.findById(userId);

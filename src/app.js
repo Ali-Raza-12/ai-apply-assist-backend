@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import cvRoutes from './routes/cvRoutes.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 
@@ -16,6 +17,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/cv", cvRoutes);
 
 
 export default app;

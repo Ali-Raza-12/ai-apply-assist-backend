@@ -1,15 +1,18 @@
 import User from "../models/User.js";
+import cloudinary from "../config/cloudinary.js";
 
 export const updateUserProfile = async (req, res) => {
   const userId = req.userId;
   console.log("Updating profile for user ID:", userId);
-  const { name, github, linkedin, portfolio, cvUrl, cvText } = req.body;
+  const { name, email, phone, github, linkedin, portfolio, cvUrl, cvText } = req.body;
   try {
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
     if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
+    if (phone !== undefined) user.phone = phone;
     if (github !== undefined) user.github = github;
     if (linkedin !== undefined) user.linkedin = linkedin;
     if (portfolio !== undefined) user.portfolio = portfolio;
@@ -24,6 +27,7 @@ export const updateUserProfile = async (req, res) => {
           id: user._id,
           name: user.name,
           email: user.email,
+          phone: user.phone,
           github: user.github,
           linkedin: user.linkedin,
           portfolio: user.portfolio,
@@ -36,5 +40,3 @@ export const updateUserProfile = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
-

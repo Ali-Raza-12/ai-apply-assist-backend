@@ -31,6 +31,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    cvPublicId: {
+      type: String,
+      default: "",
+    },
+    cvOriginalName: {
+      type: String,
+      default: "",
+    },
     cvText: {
       type: String,
       default: "",

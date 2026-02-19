@@ -16,6 +16,12 @@ export const registerUser = async (req, res) => {
     name,
     email,
     password: hashedPassword,
+    phone: "",
+    github: "",
+    linkedin: "",
+    portfolio: "",
+    cvUrl: "",
+    cvText: "",
   });
 
   const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
@@ -40,7 +46,7 @@ export const registerUser = async (req, res) => {
     .json({
       message: "User registered successfully",
       accessToken,
-      user: { id: user._id, name: user.name, email: user.email },
+      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText },
     });
 };
 
@@ -80,7 +86,7 @@ export const loginUser = async (req, res) => {
   res.status(200).json({
     message: "Login successful",
     accessToken,
-    user: { id: user._id, name: user.name, email: user.email },
+    user: { id: user._id, name: user.name, email: user.email, phone: user.phone, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText },
   });
 };
 
@@ -119,7 +125,7 @@ export const refreshAccessToken = async (req, res) => {
     const newAccessToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
       expiresIn: "10m",
     }); 
-    res.status(200).json({ accessToken: newAccessToken, user: { id: user._id, name: user.name, email: user.email, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText } });
+    res.status(200).json({ accessToken: newAccessToken, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText } });
   } catch (error) {
     return res.status(401).json({ message: "Invalid refresh token" });
   } 

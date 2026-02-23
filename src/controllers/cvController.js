@@ -83,3 +83,50 @@ export const uploadCV = async (req, res) => {
     });
   }
 };
+
+
+export const removeCV = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (!user.cvUrl) return res.status(400).json({ message: "No CV to delete" })
+
+    if (user.cvUrl) {
+      const urlParts = user.cvUrl.split("/");
+      const fileNameInBucket = urlParts.slice(-2).join("/");
+
+      const { error: deleteError } = await supabase.storage
+        .from("cvs")
+        .remove([fileNameInBucket]);
+
+      if (deleteError) {
+        console.warn("Failed to delete previous cv:", deleteError);
+      }
+
+      user.cvUrl = "";
+      user.cvText = "";
+
+      await user.save();
+
+      const userResponse = {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      github: user.github,
+      linkedin: user.linkedin,
+      portfolio: user.portfolio,
+      cvUrl: user.cvUrl,
+      cvText: user.cvText,
+    };
+
+      return res.status(200).json({ message: "CV deleted successfully", user: userResponse})
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to remove CV", error: error.message })
+  }
+}

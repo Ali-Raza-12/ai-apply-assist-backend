@@ -1,6 +1,6 @@
 import express from 'express';
 import { authMiddleware } from '../middlewares/authMiddleware.js';
-import { uploadCV } from '../controllers/cvController.js';
+import { uploadCV, removeCV } from '../controllers/cvController.js';
 import multer from "multer";
 
 const upload = multer({
@@ -19,5 +19,6 @@ const upload = multer({
 const router = express.Router();
 
 router.post("/upload", authMiddleware, upload.single('cv'),  uploadCV);
+router.delete("/removeCV", authMiddleware, removeCV);
 
 export default router;

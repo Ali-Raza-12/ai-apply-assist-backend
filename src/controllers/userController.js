@@ -1,5 +1,4 @@
 import User from "../models/User.js";
-import cloudinary from "../config/cloudinary.js";
 
 export const updateUserProfile = async (req, res) => {
   const userId = req.userId;

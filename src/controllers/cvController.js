@@ -1,10 +1,14 @@
 import User from "../models/User.js";
 import supabase from "../utills/supabase.js";
+import { extractSections } from "../services/textExtractor.js";
 
 export const uploadCV = async (req, res) => {
   try {
     const userId = req.userId;
-    if (!userId) return res.status(401).json({ message: "Unauthorized" });
+    if (!userId)
+      return res
+        .status(401)
+        .json({ message: "Unauthorized Acess. Please login first." });
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -14,51 +18,60 @@ export const uploadCV = async (req, res) => {
     const file = req.file;
     const cvText = req.body.cvText;
 
-    if (user.cvUrl) {
-      const urlParts = user.cvUrl.split("/");
-      const fileNameInBucket = urlParts.slice(-2).join("/");
-
-      const { error: deleteError } = await supabase.storage
-        .from("cvs")
-        .remove([fileNameInBucket]);
-
-      if (deleteError) {
-        console.warn("Failed to delete previous cv:", deleteError);
-      }
+    if (!cvText) {
+      return res
+        .status(400)
+        .json({ error: "cvText is required in the request body" });
     }
 
-    const fileName = `${userId}_${Date.now()}.pdf`;
-    const filePath = `user_cvs/${fileName}`;
+    const rawSections = extractSections(cvText);
 
-    const { error: uploadError } = await supabase.storage
-      .from("cvs")
-      .upload(filePath, file.buffer, { contentType: "application/pdf" });
 
-    if (uploadError) return res.status(400).json({ error: uploadError });
+    // if (user.cvUrl) {
+    //   const urlParts = user.cvUrl.split("/");
+    //   const fileNameInBucket = urlParts.slice(-2).join("/");
 
-    const { data } = supabase.storage.from("cvs").getPublicUrl(filePath);
-    const cvUrl = data.publicUrl;
+    //   const { error: deleteError } = await supabase.storage
+    //     .from("cvs")
+    //     .remove([fileNameInBucket]);
 
-    user.cvUrl = cvUrl;
-    user.cvText = cvText;
-    await user.save();
+    //   if (deleteError) {
+    //     console.warn("Failed to delete previous cv:", deleteError);
+    //   }
+    // }
 
-    const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      github: user.github,
-      linkedin: user.linkedin,
-      portfolio: user.portfolio,
-      cvUrl: user.cvUrl,
-      cvText: user.cvText,
-    };
+    // const fileName = `${userId}_${Date.now()}.pdf`;
+    // const filePath = `user_cvs/${fileName}`;
 
-    res.status(200).json({
-      message: "CV uploaded successfully",
-      user: userResponse,
-    });
+    // const { error: uploadError } = await supabase.storage
+    //   .from("cvs")
+    //   .upload(filePath, file.buffer, { contentType: "application/pdf" });
+
+    // if (uploadError) return res.status(400).json({ error: uploadError });
+
+    // const { data } = supabase.storage.from("cvs").getPublicUrl(filePath);
+    // const cvUrl = data.publicUrl;
+
+    // user.cvUrl = cvUrl;
+    // user.cvText = cvText;
+    // await user.save();
+
+    // const userResponse = {
+    //   id: user._id,
+    //   name: user.name,
+    //   email: user.email,
+    //   phone: user.phone,
+    //   github: user.github,
+    //   linkedin: user.linkedin,
+    //   portfolio: user.portfolio,
+    //   cvUrl: user.cvUrl,
+    //   cvText: user.cvText,
+    // };
+
+    // res.status(200).json({
+    //   message: "CV uploaded successfully",
+    //   user: userResponse,
+    // });
   } catch (error) {
     console.error("CV Upload Error:", error);
 
@@ -84,7 +97,6 @@ export const uploadCV = async (req, res) => {
   }
 };
 
-
 export const removeCV = async (req, res) => {
   try {
     const userId = req.userId;
@@ -93,7 +105,8 @@ export const removeCV = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!user.cvUrl) return res.status(400).json({ message: "No CV to delete" })
+    if (!user.cvUrl)
+      return res.status(400).json({ message: "No CV to delete" });
 
     if (user.cvUrl) {
       const urlParts = user.cvUrl.split("/");
@@ -113,20 +126,24 @@ export const removeCV = async (req, res) => {
       await user.save();
 
       const userResponse = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      github: user.github,
-      linkedin: user.linkedin,
-      portfolio: user.portfolio,
-      cvUrl: user.cvUrl,
-      cvText: user.cvText,
-    };
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        github: user.github,
+        linkedin: user.linkedin,
+        portfolio: user.portfolio,
+        cvUrl: user.cvUrl,
+        cvText: user.cvText,
+      };
 
-      return res.status(200).json({ message: "CV deleted successfully", user: userResponse})
+      return res
+        .status(200)
+        .json({ message: "CV deleted successfully", user: userResponse });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Failed to remove CV", error: error.message })
+    return res
+      .status(500)
+      .json({ message: "Failed to remove CV", error: error.message });
   }
-}
+};

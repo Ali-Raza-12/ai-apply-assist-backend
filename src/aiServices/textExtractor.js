@@ -34,5 +34,6 @@ export const extractSections = async (resumeText) => {
     response_format: { type: "json_object" },
   });
 
+  // console.log(response.choices[0].message.content);
   return JSON.parse(response.choices[0].message.content);
 };

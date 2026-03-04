@@ -117,7 +117,7 @@ export const loginUser = async (req, res) => {
       linkedin: user.linkedin,
       portfolio: user.portfolio,
       cvUrl: user.cvUrl,
-      parsedCV: parsedCV,
+      parsedCV: user.parsedCV | {},
     },
   });
 };

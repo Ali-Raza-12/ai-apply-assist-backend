@@ -3,7 +3,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import cvRoutes from './routes/cvRoutes.js';
-// import generateEmailRoutes from './routes/'
+import emailRoutes from './routes/emailRoutes.js';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 
@@ -32,7 +32,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/cv", cvRoutes);
-// app.user("/api/ai", generateEmailRoutes)
+app.use("/api/email", emailRoutes)
 
 
 export default app;

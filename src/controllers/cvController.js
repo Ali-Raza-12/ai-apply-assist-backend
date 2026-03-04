@@ -1,6 +1,6 @@
 import User from "../models/User.js";
-import supabase from "../utills/supabase.js";
-import { extractSections } from "../services/textExtractor.js";
+import supabase from "../utils/supabase.js";
+import { extractSections } from "../aiServices/textExtractor.js";
 
 export const uploadCV = async (req, res) => {
   try {
@@ -41,7 +41,7 @@ export const uploadCV = async (req, res) => {
 
     res.status(200).json({
       message: "CV uploaded successfully",
-      parsedCV: sanitizedSections,
+      parsedCV: rawSections,
     });
 
   } catch (error) {

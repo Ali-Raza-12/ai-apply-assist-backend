@@ -21,15 +21,23 @@ export const registerUser = async (req, res) => {
     linkedin: "",
     portfolio: "",
     cvUrl: "",
-    cvText: "",
+    parsedCV: {},
   });
 
-  const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: "10m",
-  });
-  const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: "7d",
-  });
+  const accessToken = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_ACCESS_SECRET,
+    {
+      expiresIn: "10m",
+    },
+  );
+  const refreshToken = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
 
   user.refreshToken = refreshToken;
   await user.save();
@@ -41,17 +49,24 @@ export const registerUser = async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  res
-    .status(201)
-    .json({
-      message: "User registered successfully",
-      accessToken,
-      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText },
-    });
+  res.status(201).json({
+    message: "User registered successfully",
+    accessToken,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      github: user.github,
+      linkedin: user.linkedin,
+      portfolio: user.portfolio,
+      cvUrl: user.cvUrl,
+      parsedCV: user.parsedCV,
+    },
+  });
 };
 
 export const loginUser = async (req, res) => {
-
   const { email, password } = req.body;
 
   const user = await User.findOne({ email });
@@ -64,16 +79,24 @@ export const loginUser = async (req, res) => {
     return res.status(400).json({ message: "Invalid credentials" });
   }
 
-  const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
-    expiresIn: "10m",
-  });
+  const accessToken = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_ACCESS_SECRET,
+    {
+      expiresIn: "10m",
+    },
+  );
 
-  const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: "7d",
-  }); 
+  const refreshToken = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: "7d",
+    },
+  );
 
   user.refreshToken = refreshToken;
-  await user.save();  
+  await user.save();
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true,
@@ -82,11 +105,20 @@ export const loginUser = async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-
   res.status(200).json({
     message: "Login successful",
     accessToken,
-    user: { id: user._id, name: user.name, email: user.email, phone: user.phone, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText },
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      github: user.github,
+      linkedin: user.linkedin,
+      portfolio: user.portfolio,
+      cvUrl: user.cvUrl,
+      parsedCV: parsedCV,
+    },
   });
 };
 
@@ -105,28 +137,52 @@ export const logoutUser = async (req, res) => {
   await user.save();
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",  
+    secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
   });
   res.status(200).json({ message: "Logout successful" });
-}
+};
 
 export const refreshAccessToken = async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
+
   if (!refreshToken) {
     return res.status(401).json({ message: "No refresh token provided" });
-  } 
+  }
   try {
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
     const user = await User.findById(decoded.userId);
-    if (!user || user.refreshToken !== refreshToken) {
-      return res.status(401).json({ message: "Invalid refresh token" });
-    } 
-    const newAccessToken = jwt.sign({ userId: user._id }, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: "10m",
-    }); 
-    res.status(200).json({ accessToken: newAccessToken, user: { id: user._id, name: user.name, email: user.email, phone: user.phone, github: user.github, linkedin: user.linkedin, portfolio: user.portfolio, cvUrl: user.cvUrl, cvText: user.cvText } });
+    if (!user) {
+      return res.status(401).json({ message: "User not found" });
+    }
+    if (user.refreshToken !== refreshToken) {
+      return res.status(401).json({ message: "Refresh token is mismatched" });
+    }
+    const newAccessToken = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_ACCESS_SECRET,
+      {
+        expiresIn: "10m",
+      },
+    );
+    res
+      .status(200)
+      .json({
+        message: "Access Token refresh successfully",
+        accessToken: newAccessToken,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          github: user.github,
+          linkedin: user.linkedin,
+          portfolio: user.portfolio,
+          cvUrl: user.cvUrl,
+          parsedCV: user.parsedCV || {},
+        },
+      });
   } catch (error) {
     return res.status(401).json({ message: "Invalid refresh token" });
-  } 
-}
+  }
+};

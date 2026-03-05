@@ -3,7 +3,7 @@ import User from "../models/User.js";
 export const updateUserProfile = async (req, res) => {
   const userId = req.userId;
 
-  const { name, email, phone, github, linkedin, portfolio, cvUrl, cvText } = req.body;
+  const { name, email, phone, github, linkedin, portfolio, cvText } = req.body;
   try {
     const user = await User.findById(userId);
     if (!user) {
@@ -15,7 +15,6 @@ export const updateUserProfile = async (req, res) => {
     if (github !== undefined) user.github = github;
     if (linkedin !== undefined) user.linkedin = linkedin;
     if (portfolio !== undefined) user.portfolio = portfolio;
-    if (cvUrl !== undefined) user.cvUrl = cvUrl;
     if (cvText !== undefined) user.cvText = cvText;
     await user.save();
     res

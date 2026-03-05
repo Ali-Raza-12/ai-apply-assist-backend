@@ -117,7 +117,7 @@ export const loginUser = async (req, res) => {
       linkedin: user.linkedin,
       portfolio: user.portfolio,
       cvUrl: user.cvUrl,
-      parsedCV: user.parsedCV | {},
+      parsedCV: user.parsedCV || {},
     },
   });
 };
@@ -170,17 +170,7 @@ export const refreshAccessToken = async (req, res) => {
       .json({
         message: "Access Token refresh successfully",
         accessToken: newAccessToken,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          phone: user.phone,
-          github: user.github,
-          linkedin: user.linkedin,
-          portfolio: user.portfolio,
-          cvUrl: user.cvUrl,
-          parsedCV: user.parsedCV || {},
-        },
+        user: user
       });
   } catch (error) {
     return res.status(401).json({ message: "Invalid refresh token" });

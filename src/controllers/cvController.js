@@ -11,12 +11,30 @@ export const uploadCV = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    if (!req.file)
-      return res.status(400).json({ message: "No file uploaded" });
+    if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
     const cvText = req.body.cvText;
     if (!cvText || typeof cvText !== "string")
       return res.status(400).json({ error: "Invalid cvText" });
+
+    if (user.cvUrl) {
+      try {
+        const url = new URL(user.cvUrl);
+        const oldFilePath = url.pathname.split("/cvs/")[1];
+
+        if (oldFilePath) {
+          const { error: deleteError } = await supabase.storage
+            .from("cvs")
+            .remove([oldFilePath]);
+
+          if (deleteError)
+            console.warn("Failed to delete old CV:", deleteError.message);
+          else console.log("Old CV deleted successfully:", oldFilePath);
+        }
+      } catch (err) {
+        console.warn("Error parsing old CV URL:", err.message);
+      }
+    }
 
     const fileName = `${userId}_${Date.now()}.pdf`;
     const filePath = `user_cvs/${fileName}`;
@@ -30,20 +48,27 @@ export const uploadCV = async (req, res) => {
     if (uploadError)
       return res.status(400).json({ error: uploadError.message });
 
-    const { data } = supabase.storage.from("cvs").getPublicUrl(filePath);
+    const { data: publicUrlData, error: urlError } = supabase.storage
+      .from("cvs")
+      .getPublicUrl(filePath);
+
+    if (urlError) return res.status(500).json({ error: urlError.message });
+
+    console.log("CV URL", publicUrlData.publicUrl);
 
     const rawSections = await extractSections(cvText);
 
-    user.cvUrl = data.publicUrl;
+    const cvUrl = publicUrlData.publicUrl;
+
+    user.cvUrl = cvUrl;
     user.parsedCV = rawSections;
 
     await user.save();
 
     res.status(200).json({
       message: "CV uploaded successfully",
-      parsedCV: rawSections,
+      user: user,
     });
-
   } catch (error) {
     console.error("CV Upload Error:", error);
     res.status(500).json({
@@ -51,7 +76,6 @@ export const uploadCV = async (req, res) => {
     });
   }
 };
-
 
 export const removeCV = async (req, res) => {
   try {

@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 
 const jobSchema = new mongoose.Schema({
-  user: {
+  userId: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -13,6 +13,9 @@ const jobSchema = new mongoose.Schema({
   hrEmail: {
     type: String,
     required: true,
+  },
+  Status: {
+    type: String
   },
   appliedAt: {
     type: Date,

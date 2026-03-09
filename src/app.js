@@ -4,6 +4,7 @@ import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import cvRoutes from './routes/cvRoutes.js';
 import emailRoutes from './routes/emailRoutes.js';
+import jobRoutes from "./routes/jobRoutes.js"
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 
@@ -33,6 +34,7 @@ app.use('/api/auth', authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/cv", cvRoutes);
 app.use("/api/email", emailRoutes)
+app.use("/api/jobs", jobRoutes)
 
 
 export default app;

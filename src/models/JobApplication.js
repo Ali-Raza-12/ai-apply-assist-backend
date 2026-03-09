@@ -14,7 +14,7 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  Status: {
+  status: {
     type: String
   },
   appliedAt: {

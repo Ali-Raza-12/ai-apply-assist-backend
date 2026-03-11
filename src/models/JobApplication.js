@@ -23,7 +23,7 @@ const jobSchema = new mongoose.Schema({
   },
 });
 
-jobSchema.index({ user: 1, hrEmail: 1 }, { unique: true }); 
+jobSchema.index({ userId: 1, hrEmail: 1 }, { unique: true });
 
 const Job = mongoose.model("Job", jobSchema);
 export default Job;

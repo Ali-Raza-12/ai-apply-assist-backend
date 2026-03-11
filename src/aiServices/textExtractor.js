@@ -4,7 +4,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-export const extractSections = async (resumeText) => {
+export const extractSections = async (parsedCV) => {
   const response = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile", 
     temperature: 0,

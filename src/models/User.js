@@ -15,8 +15,8 @@ const parsedCVSchema = new mongoose.Schema(
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    phone: { type: String },
+    email: { type: String, required: true, unique: true, index: true },
+    phone: { type: String, default: "" },
     linkedin: { type: String, default: "" },
     github: { type: String, default: "" },
     portfolio: { type: String, default: "" },

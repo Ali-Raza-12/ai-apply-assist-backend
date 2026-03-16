@@ -114,7 +114,7 @@ export const sendApplicationEmail = async (req, res, next) => {
     }
 
     const emailResult = await sendEmail({
-      to: "ahmadbroothers13@gmail.com",
+      to: hrEmail,
       subject,
       html: html,
       attachments: attachment,

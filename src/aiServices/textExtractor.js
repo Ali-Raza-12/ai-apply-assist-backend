@@ -28,12 +28,11 @@ export const extractSections = async (parsedCV) => {
       },
       {
         role: "user",
-        content: resumeText,
+        content: parsedCV,
       },
     ],
     response_format: { type: "json_object" },
   });
-
-  // console.log(response.choices[0].message.content);
+  
   return JSON.parse(response.choices[0].message.content);
 };

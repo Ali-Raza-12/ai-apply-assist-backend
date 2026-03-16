@@ -2,7 +2,7 @@ import multer from "multer";
 
 export const uploadCVMiddleware = multer({
     storage: multer.memoryStorage(),
-    fileFilter: (req, res, cb) => {
+    fileFilter: (req, file, cb) => {
         const allowedMimeTypes = ["application/pdf"];
 
         if(!allowedMimeTypes.includes(file.mimetype)) {
